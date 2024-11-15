@@ -80,6 +80,10 @@ interface range GigabitEthernetTw1/0/25-36
  description 
  
  
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 666
+ 
  
  no shutdown
 !
@@ -88,6 +92,10 @@ interface range GigabitEthernetTw1/0/25-36
 interface range GigabitEthernetTe1/0/37-48
  description 
  
+ 
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 666
  
  
  no shutdown
@@ -119,6 +127,10 @@ interface range GigabitEthernetTw1/0/25-36
  description 
  
  
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 666
+ 
  
  no shutdown
 !
@@ -127,6 +139,10 @@ interface range GigabitEthernetTw1/0/25-36
 interface range GigabitEthernetTe1/0/37-48
  description 
  
+ 
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 666
  
  
  no shutdown

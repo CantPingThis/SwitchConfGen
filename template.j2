@@ -66,7 +66,7 @@ interface range GigabitEthernet{{ int_range.range }}
  {% elif int_range.type == 'ap' %}
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport trunk allowed vlan {{ int_range|get_trunk_vlans_ap }}
+ switchport trunk allowed vlan {{ vlans|get_trunk_vlans_ap }}
  {% endif %}
  {% endif %}
  no shutdown
