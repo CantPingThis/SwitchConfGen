@@ -108,7 +108,7 @@ def main():
     # Create output directory if it doesn't exist
     os.makedirs(args.output_dir, exist_ok=True)
     
-    for switch in switches_data:
+    for switch in switches_data['switches']:
         
         config_data = merge_configurations(base_config, global_config, switch)
         

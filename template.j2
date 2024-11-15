@@ -1,0 +1,154 @@
+{# Cisco Switch Configuration Template #}
+!
+! Device: {{ hostname }}
+! Generated: {{ generation_timestamp }}
+!
+service password-encryption
+service timestamps debug datetime msec localtime
+service timestamps log datetime msec localtime
+!
+hostname {{ hostname }}
+!
+boot-start-marker
+boot-end-marker
+!
+! Enable secret for privileged access
+enable secret {{ enable_password }}
+!
+no ip domain-lookup
+ip domain-name {{ domain_name }}
+!
+! Stack Configuration
+! Switch Stack Configuration
+stack-mac persistent timer 0
+!
+{% for member in stack.member %}
+! Stack Member {{ member.id }} Configuration
+switch {{ member.id }} provision {{ member.model }}
+switch {{ member.id }} priority {{ member.priority }}
+{% endfor %}
+!
+!
+! VLANs Configuration
+{% for vlan in vlans %}
+vlan {{ vlan.id }}
+ name {{ vlan.name }}
+{% endfor %}
+!
+! Global Spanning Tree Configuration
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+!
+! Global QoS Configuration
+mls qos
+!
+! Interface Configurations
+{# Interface Configuration Section #}
+{% if stack is defined and stack.member is defined %}
+{# Stack member interface configurations #}
+{% for member in stack.member %}
+{% if member.interfaces is defined %}
+{% for int_range in member.interfaces %}
+!
+interface range GigabitEthernet{{ int_range.range }}
+ description {{ int_range.description }}
+ {% if int_range.type is defined %}
+ {% if int_range.type == 'laptop' %}
+ switchport mode access
+ switchport access vlan {{ int_range.vlan }}
+ switchport port-security
+ switchport port-security maximum 3
+ switchport port-security aging time 2
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ {% elif int_range.type == 'ap' %}
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan {{ int_range|get_trunk_vlans_ap }}
+ {% endif %}
+ {% endif %}
+ no shutdown
+!
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% else %}
+{# Non-stacked switch interface configuration #}
+{% for int_range in interfaces %}
+!
+interface {{ interface.name }}
+ description {{ interface.description }}
+ {% if interfaces.type == 'laptop' %}
+ switchport mode access
+ switchport access vlan {{ interface.vlan }}
+ switchport port-security
+ switchport port-security maximum 3
+ switchport port-security aging time 2
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ {% elif interface.mode == 'ap' %}
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan {{ interface|get_trunk_vlans(vlans) }}
+ {% endif %}
+ {% if interface.status == 'up' %}
+ no shutdown
+ {% else %}
+ shutdown
+ {% endif %}
+{% endfor %}
+{% endif %}
+!
+! Management VLAN Interface
+interface Vlan{{ mgmt_vlan }}
+ description Management VLAN
+ ip address {{ mgmt_ip }} {{ mgmt_subnet }}
+ no ip redirects
+ no ip proxy-arp
+ no shutdown
+!
+! Management Gateway
+ip default-gateway {{ default_gateway }}
+!
+! SSH Configuration
+crypto key generate rsa modulus 2048
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+!
+! User Configuration
+aaa new-model
+aaa authentication login default local
+aaa authorization exec default local
+!
+{% for user in users %}
+username {{ user.name }} privilege {{ user.privilege }} secret {{ user.password }}
+{% endfor %}
+!
+! NTP Configuration
+{% if ntp_servers is defined %}
+{% for server in ntp_servers %}
+ntp server {{ server }}
+{% endfor %}
+{% endif %}
+!
+! Syslog Configuration
+{% if syslog_servers is defined %}
+{% for server in syslog_servers %}
+logging host {{ server }}
+{% endfor %}
+{% endif %}
+!
+! SNMP Configuration
+{% if snmp is defined %}
+snmp-server location "{{ snmp.location }}"
+snmp-server contact "{{ snmp.contact }}"
+{% for community in snmp.communities %}
+snmp-server community {{ community.name }} {{ community.access }}
+{% endfor %}
+{% endif %}
+!
+! End of configuration
+end

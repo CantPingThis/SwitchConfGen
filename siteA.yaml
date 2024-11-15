@@ -1,0 +1,68 @@
+---
+global:
+  mgmt_mask: 255.255.255.224
+  mgmt_gw: 10.254.254.1
+  vtpDomain: HomeLab
+  mgmt_vlan: 99
+  source_mgmt_int: Vlan99
+  ce_1: ISR_H10
+  uplink_ce_1: Ten 1/1/1
+  ce_2: ISR_H20
+  uplink_ce_2: Ten2/1/1
+switches:
+  - hostname: HOM-SWA-001
+    mgmt_ip: 10.254.254.2
+    snmp_location: HOM|1
+    po_ce_1: Po10
+    po_ce_2: Po20
+    stack:
+      count:
+      member:
+        - id: 1
+          model: "c9300-48uxm"
+          priority: 15
+          interfaces:
+            - range: Tw1/0/1-24
+              type: laptop
+            - range: Tw1/0/25-36
+              type: ap
+            - range: Te1/0/37-48
+              type: ap
+        - id: 2
+          model: "c9300-48uxm"
+          priority: 10
+          interfaces:
+            - range: Tw1/0/1-24
+              type: laptop
+            - range: Tw1/0/25-36
+              type: ap
+            - range: Te1/0/37-48
+              type: ap
+  - hostname: HOM-SWA-003
+    mgmt_ip: 10.254.254.2
+    snmp_location: HOM|2
+    po_ce_1: Po10
+    po_ce_2: Po20
+    stack:
+      count:
+      member:
+        - id: 1
+          model: "c9300-48uxm"
+          priority: 15
+          interfaces:
+            - range: Tw1/0/1-24
+              type: laptop
+            - range: Tw1/0/25-36
+              type: ap
+            - range: Te1/0/37-48
+              type: ap
+        - id: 2
+          model: "c9300-48uxm"
+          priority: 10
+          interfaces:
+            - range: Tw1/0/1-24
+              type: laptop
+            - range: Tw1/0/25-36
+              type: ap
+            - range: Te1/0/37-48
+              type: ap

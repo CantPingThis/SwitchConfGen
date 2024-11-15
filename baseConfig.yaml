@@ -1,0 +1,10 @@
+---
+vlans:
+  - id: 99
+    name: Admin
+    trunk: True
+    ap: False
+  - id: 666
+    name: NAC_TRASH
+    trunk: False
+    ap: True
