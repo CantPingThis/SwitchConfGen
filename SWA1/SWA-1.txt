@@ -12,9 +12,6 @@ hostname SWA-1
 !
 ! VLANs Configuration
 
-vlan 1
- name default
-
 vlan 99
  name admin
 
