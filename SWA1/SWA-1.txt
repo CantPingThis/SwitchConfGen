@@ -2,6 +2,7 @@
 !
 ! Device: SWA-1
 ! Model: C9300-48UXM
+! Template : 9300.j2
 !
 service password-encryption
 service timestamps debug datetime msec localtime

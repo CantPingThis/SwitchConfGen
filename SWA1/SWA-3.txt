@@ -2,6 +2,7 @@
 !
 ! Device: SWA-3
 ! Model: 2960X
+! Template : 2960x.j2
 !
 service password-encryption
 service timestamps debug datetime msec localtime

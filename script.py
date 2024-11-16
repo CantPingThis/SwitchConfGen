@@ -46,6 +46,15 @@ def get_switches_from_db():
     conn.close()
     return{'switches': switches}
 
+def get_template_path(model):
+    """Get the template path based on the model"""
+    template_mapping = {
+        'C9300-48UXM': '9300.j2',
+        '4506-E': '4500.j2',
+        '2960X': '2960x.j2'
+    }
+    return template_mapping.get(model)
+
 def load_yaml_file(file_path):
     """Load data from a YAML file."""
     try:
@@ -129,7 +138,6 @@ def save_config(config, filename):
 
 def main():
     parser = argparse.ArgumentParser(description='Generate multiple Cisco switch configurations from template')
-    parser.add_argument('-t', '--template', required=True, help='Path to the Jinja2 template file')
     parser.add_argument('-v', '--vlans', required=True, help='Path to the vlans file')
     parser.add_argument('-o', '--output-dir', required=True, help='Output directory for the generated configurations')
     parser.add_argument('--print', action='store_true', help='Print the configurations to console')
@@ -149,13 +157,15 @@ def main():
     
     for switch in switches_data['switches']:
         
+        template_path = get_template_path(switch['model'])
+
         config_data = {
             'vlans': vlans,
             **switch
         } 
         #print(config_data)       
         # Generate the configuration
-        config = generate_config(args.template, config_data)
+        config = generate_config(template_path, config_data)
         
         # Create output filename based on hostname
         output_file = os.path.join(args.output_dir, f"{switch['hostname']}.txt")
