@@ -1,0 +1,16 @@
+[
+    {
+        "interface": "Gi1/0/48",
+        "mac_add": "d015.a6c5.63a7",
+        "domain": "DATA",
+        "method": "mab",
+        "status": "auth"
+    },
+    {
+        "interface": "Gi1/0/10",
+        "mac_add": "f8b5.6a0e.cbaf",
+        "domain": "DATA",
+        "method": "mab",
+        "status": "auth"
+    }
+]

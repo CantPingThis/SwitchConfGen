@@ -1,11 +1,50 @@
 import argparse
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 import yaml
+import json
+import sqlite3
 import os
 import sys
 from pathlib import Path
 from datetime import datetime
 from copy import deepcopy
+
+def load_vlans_from_json(json_path):
+    """Load VLAN data from JSON file."""
+    with open(json_path, 'r') as f:
+        raw_vlans = json.load(f)
+    
+    vlans = []
+    for vlan in raw_vlans:
+        if vlan == '1':
+            pass
+        else:
+            vlans.append({
+                'id': vlan['vlan_id'],
+                'name': vlan['vlan_name'],
+                'trunk': True
+            })
+    return vlans
+
+def get_switches_from_db():
+    """Get switches from SQL Database"""
+    conn = sqlite3.connect('db/db.sqlite')
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT hostname, invetory_mgmt_ip, model
+        FROM Prechecks
+    ''')
+
+    switches = []
+    for row in cursor.fetchall():
+        switches.append({
+            'hostname': row[0],
+            'mgmt_ip': row[1],
+            'model': row[2]
+        })
+    conn.close()
+    return{'switches': switches}
 
 def load_yaml_file(file_path):
     """Load data from a YAML file."""
@@ -91,8 +130,7 @@ def save_config(config, filename):
 def main():
     parser = argparse.ArgumentParser(description='Generate multiple Cisco switch configurations from template')
     parser.add_argument('-t', '--template', required=True, help='Path to the Jinja2 template file')
-    parser.add_argument('-b', '--base-config', required=True, help='Path to the base YAML configuration file')
-    parser.add_argument('-s', '--switches', required=True, help='Path to the switches YAML configuration file')
+    parser.add_argument('-v', '--vlans', required=True, help='Path to the vlans file')
     parser.add_argument('-o', '--output-dir', required=True, help='Output directory for the generated configurations')
     parser.add_argument('--print', action='store_true', help='Print the configurations to console')
     
@@ -100,9 +138,10 @@ def main():
 
     # Load configuration data
     print("Loading configuration files...")
-    base_config = load_yaml_file(args.base_config)
-    switches_data = load_yaml_file(args.switches)
-
+    #base_config = load_yaml_file(args.base_config)
+    vlans = load_vlans_from_json(args.vlans)
+    switches_data = get_switches_from_db()
+    print(switches_data)
     global_config = switches_data.get('global', {})
 
     # Create output directory if it doesn't exist
@@ -110,8 +149,11 @@ def main():
     
     for switch in switches_data['switches']:
         
-        config_data = merge_configurations(base_config, global_config, switch)
-        
+        config_data = {
+            'vlans': vlans,
+            **switch
+        } 
+        #print(config_data)       
         # Generate the configuration
         config = generate_config(args.template, config_data)
         

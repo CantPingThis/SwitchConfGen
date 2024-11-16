@@ -1,0 +1,26 @@
+{# Cisco Switch Configuration Template #}
+!
+! Device: {{ hostname }}
+! Model: {{ model }}
+! Template : 4500.j2
+!
+service password-encryption
+service timestamps debug datetime msec localtime
+service timestamps log datetime msec localtime
+!
+hostname {{ hostname }}
+!
+! VLANs Configuration
+{% for vlan in vlans %}
+vlan {{ vlan.id }}
+ name {{ vlan.name }}
+{% endfor %}
+!
+! Management VLAN Interface
+interface Vlan{{ mgmt_vlan }}
+ description Management VLAN
+ ip address {{ mgmt_ip }} {{ mgmt_subnet }}
+ no ip redirects
+ no ip proxy-arp
+ no shutdown
+!

@@ -1,0 +1,54 @@
+[
+    {
+        "vlan_id": "1",
+        "vlan_name": "default"
+    },
+    {
+        "vlan_id": "99",
+        "vlan_name": "admin"
+    },
+    {
+        "vlan_id": "1500",
+        "vlan_name": "RLP_RDS_DATA"
+    },
+    {
+        "vlan_id": "1600",
+        "vlan_name": "RLP_ITEC_DATA"
+    },   
+    {
+        "vlan_id": "1602",
+        "vlan_name": "RLP_ITEC_VOICE"
+    },
+    {
+        "vlan_id": "1701",
+        "vlan_name": "MAB_VISIO"
+    },   
+    {
+        "vlan_id": "1702",
+        "vlan_name": "MAB_ADD-ON-VISIO"
+    },   
+    {
+        "vlan_id": "1703",
+        "vlan_name": "MAB_PRINTERS"
+    },   
+    {
+        "vlan_id": "1704",
+        "vlan_name": "MAB_IP-PHONES"
+    },
+    {
+        "vlan_id": "1705",
+        "vlan_name": "MAB_MULTIMEDIA"
+    },   
+    {
+        "vlan_id": "1706",
+        "vlan_name": "MAB_OTHER"
+    },
+    {
+        "vlan_id": "1900",
+        "vlan_name": "RLP_WIFI_MGT"
+    },   
+    {
+        "vlan_id": "1902",
+        "vlan_name": "RLP_WIFI_MGT_ARUBA"
+    }
+]

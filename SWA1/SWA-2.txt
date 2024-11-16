@@ -1,0 +1,61 @@
+
+!
+! Device: SWA-2
+! Model: 4506-E
+!
+service password-encryption
+service timestamps debug datetime msec localtime
+service timestamps log datetime msec localtime
+!
+hostname SWA-2
+!
+! VLANs Configuration
+
+vlan 1
+ name default
+
+vlan 99
+ name admin
+
+vlan 1500
+ name RLP_RDS_DATA
+
+vlan 1600
+ name RLP_ITEC_DATA
+
+vlan 1602
+ name RLP_ITEC_VOICE
+
+vlan 1701
+ name MAB_VISIO
+
+vlan 1702
+ name MAB_ADD-ON-VISIO
+
+vlan 1703
+ name MAB_PRINTERS
+
+vlan 1704
+ name MAB_IP-PHONES
+
+vlan 1705
+ name MAB_MULTIMEDIA
+
+vlan 1706
+ name MAB_OTHER
+
+vlan 1900
+ name RLP_WIFI_MGT
+
+vlan 1902
+ name RLP_WIFI_MGT_ARUBA
+
+!
+! Management VLAN Interface
+interface Vlan
+ description Management VLAN
+ ip address 192.168.2.20 
+ no ip redirects
+ no ip proxy-arp
+ no shutdown
+!
