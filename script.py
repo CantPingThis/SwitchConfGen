@@ -12,10 +12,18 @@ from copy import deepcopy
 class ConfigGenerator:
     def __init__(self):
         self.template_mapping = {
-            'C9300-48UXM': 'templates/9300.j2',
-            '4506-E': 'templates/4500.j2',
-            '2960X': 'templates/2960x.j2'
+            'C9300-48UXM': '9300.j2',
+            '4506-E': '4500.j2',
+            '2960X': '2960x.j2'
         }
+        self.checks_path = 'output/checks/campus'
+
+    def get_vlan_file_path(self, hostname):
+        """Get the VLAN file path based on the hostname"""
+        vlan_path = os.path.join(self.checks_path, hostname, 'vlan_list.json')
+        if os.path.exists(vlan_path):
+            return vlan_path
+        return None
 
     @staticmethod
     def trunk_or_not(vlan):
@@ -32,7 +40,7 @@ class ConfigGenerator:
                 'id': vlan['vlan_id'],
                 'name': vlan['vlan_name'],
                 'trunk': self.trunk_or_not(vlan)
-            } for vlan in raw_vlans]
+            } for vlan in raw_vlans if vlan['vlan_id'] != '1']
         except Exception as e:
             print(f"Error loading VLAN data: {e}")
             sys.exit(1)
@@ -68,8 +76,8 @@ class ConfigGenerator:
         """Generate switch configuration from template"""
         try:
             env = Environment(
-                loader=FileSystemLoader(os.path.dirname(template_path)),
-                undefined=StrictUndefined
+                loader=FileSystemLoader(os.path.dirname(template_path))
+                #undefined=StrictUndefined
             )
             template = env.get_template(os.path.basename(template_path))
             return template.render(config_data)
@@ -90,7 +98,6 @@ class ConfigGenerator:
 
 def main():
     parser = argparse.ArgumentParser(description='Generate switch configurations')
-    parser.add_argument('-v', '--vlans', required=True, help='Path to VLAN list JSON file')
     parser.add_argument('-o', '--output-dir', required=True, help='Output directory for configurations')
     parser.add_argument('--print', action='store_true', help='Print configurations to console')
     
@@ -99,7 +106,6 @@ def main():
     
     # Load configuration data
     print("Loading configuration files...")
-    vlans = generator.load_vlans_from_json(args.vlans)
     switches_data = generator.get_switches_from_db()
     
     # Create output directory
@@ -107,6 +113,14 @@ def main():
     
     # Generate configurations for each switch
     for switch in switches_data['switches']:
+
+        vlan_file = generator.get_vlan_file_path(switch['hostname'])
+        if not vlan_file:
+            print(f"Warning: No VLAN file found for {switch['hostname']}")
+            continue
+
+        vlans = generator.load_vlans_from_json(vlan_file)
+        
         template_path = generator.get_template_path(switch['model'])
         if not template_path:
             print(f"Warning: No template found for model {switch['model']}")

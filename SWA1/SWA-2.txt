@@ -15,12 +15,6 @@ hostname SWA-2
 vlan 99
  name admin
 
-vlan 1500
- name RLP_RDS_DATA
-
-vlan 1600
- name RLP_ITEC_DATA
-
 vlan 1602
  name RLP_ITEC_VOICE
 

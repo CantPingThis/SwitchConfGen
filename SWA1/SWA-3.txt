@@ -42,9 +42,6 @@ vlan 1705
 vlan 1706
  name MAB_OTHER
 
-vlan 1900
- name RLP_WIFI_MGT
-
 vlan 1902
  name RLP_WIFI_MGT_ARUBA
 
