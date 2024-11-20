@@ -18,11 +18,14 @@ class ConfigGenerator:
         }
         self.checks_path = 'output/checks/campus'
 
-    def get_vlan_file_path(self, hostname):
+    def get_file_path(self, hostname, type):
         """Get the VLAN file path based on the hostname"""
-        vlan_path = os.path.join(self.checks_path, hostname, 'vlan_list.json')
-        if os.path.exists(vlan_path):
-            return vlan_path
+        if type == 'vlan':
+            file_path = os.path.join(self.checks_path, hostname, 'vlan_list.json')
+        elif type == 'interface':
+            file_path = os.path.join(self.checks_path, hostname, 'interfaces.json')
+        if os.path.exists(file_path):
+            return file_path
         return None
 
     @staticmethod
@@ -96,6 +99,52 @@ class ConfigGenerator:
             print(f"Error saving configuration: {e}")
             sys.exit(1)
 
+    def find_mgmt_interface(self, switch, json_path):
+        """
+        Find management interface and subnet mask from interfaces.json.
+        
+        Args:
+            switch (dict): Switch data containing mgmt_ip
+            json_path (str): Path to interfaces.json file
+            
+        Returns:
+            dict: Interface info with name and mask, or None if not found
+        """
+        try:
+            # Construct path to interfaces.json for this switch
+            interface_file = os.path.join(
+                self.checks_path,
+                switch['hostname'],
+                'interfaces.json'
+            )
+            
+            # Load interfaces data
+            with open(interface_file, 'r') as f:
+                interfaces = json.load(f)
+            
+            # Get management IP without CIDR if present
+            mgmt_ip = switch['mgmt_ip'].split('/')[0]
+            
+            # Search through interfaces
+            for interface in interfaces:
+                if interface.get('ip_address') == mgmt_ip:
+                    return {
+                        'name': interface['interface'],
+                        'mask': interface['prefix_length']                    }
+            
+            print(f"Warning: No matching interface found for IP {mgmt_ip}")
+            return None
+            
+        except FileNotFoundError:
+            print(f"Warning: interfaces.json not found for {switch['hostname']}")
+            return None
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in interfaces file for {switch['hostname']}")
+            return None
+        except Exception as e:
+            print(f"Error finding management interface: {e}")
+            return None
+
 def main():
     parser = argparse.ArgumentParser(description='Generate switch configurations')
     parser.add_argument('-o', '--output-dir', required=True, help='Output directory for configurations')
@@ -114,13 +163,25 @@ def main():
     # Generate configurations for each switch
     for switch in switches_data['switches']:
 
-        vlan_file = generator.get_vlan_file_path(switch['hostname'])
+        vlan_file = generator.get_file_path(switch['hostname'], 'vlan')
         if not vlan_file:
             print(f"Warning: No VLAN file found for {switch['hostname']}")
             continue
 
         vlans = generator.load_vlans_from_json(vlan_file)
-        
+
+        interface_file = generator.get_file_path(switch['hostname'], 'interface')
+        if not vlan_file:
+            print(f"Warning: No VLAN file found for {switch['hostname']}")
+            continue
+
+        mgmt_interface = generator.find_mgmt_interface(switch,interface_file)
+        if mgmt_interface:
+            switch.update({
+                'mgmt_interface': mgmt_interface['name'],
+                'mgmt_subnet': mgmt_interface['mask']
+            })
+
         template_path = generator.get_template_path(switch['model'])
         if not template_path:
             print(f"Warning: No template found for model {switch['model']}")

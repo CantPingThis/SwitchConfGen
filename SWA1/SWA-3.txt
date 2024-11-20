@@ -47,9 +47,9 @@ vlan 1902
 
 !
 ! Management VLAN Interface
-interface Vlan
+interface VlanNone
  description Management VLAN
- ip address 192.168.3.30 
+ ip address 192.168.3.30 26
  no ip redirects
  no ip proxy-arp
  no shutdown

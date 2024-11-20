@@ -1,0 +1,24 @@
+[
+    {
+       "interface": "GigabitEthernet1/0/1",
+       "link_status": "down",
+       "protocol_status": "down",
+       "ip_address": "",
+       "prefix_length": ""
+    },
+    {
+       "interface": "GigabitEthernet1/0/2",
+       "link_status": "up",
+       "protocol_status": "up",
+       "ip_address": "",
+       "prefix_length": ""
+    },
+    {
+       "interface": "Vlan99",
+       "link_status": "up",
+       "protocol_status": "up",
+       "ip_address": "192.168.1.10",
+       "prefix_length": "26"
+    }
+   
+   ]
