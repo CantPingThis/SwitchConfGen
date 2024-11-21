@@ -1,0 +1,10 @@
+def scp_file_to_switch(switch_ip, username, password, local_file_path, remote_file_path):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(switch_ip, username=username, password=password)
+
+    sftp = ssh.open_sftp()
+    sftp.put(local_file_path, remote_file_path)
+    sftp.close()
+
+    ssh.close()

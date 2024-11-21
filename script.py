@@ -12,9 +12,9 @@ from copy import deepcopy
 class ConfigGenerator:
     def __init__(self):
         self.template_mapping = {
-            'C9300-48UXM': '9300.j2',
-            '4506-E': '4500.j2',
-            '2960X': '2960x.j2'
+            'C9300-48UXM': 'template.j2',
+            '4506-E': 'template.j2',
+            '2960X': 'template.j2'
         }
         self.checks_path = 'output/checks/campus'
 
@@ -82,7 +82,10 @@ class ConfigGenerator:
                 loader=FileSystemLoader(os.path.dirname(template_path))
                 #undefined=StrictUndefined
             )
+            print(os.path.basename(template_path))
+            print(os.path.dirname(template_path))
             template = env.get_template(os.path.basename(template_path))
+            print(template)
             return template.render(config_data)
         except Exception as e:
             print(f"Error generating configuration: {e}")
